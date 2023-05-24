@@ -1,0 +1,26 @@
+{
+  "name": "api24",
+  "version": "1.0.0",
+  "description": "",
+  "main": "app.js",
+  "type": "module",
+  "scripts": {
+    "start": "nodemon app.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://ghp_K69dl51dnS8VZHxdZkgH0JM0Y29c0i089yt@github.com/abhishek8445/api24.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/abhishek8445/api24/issues"
+  },
+  "homepage": "https://github.com/abhishek8445/api24#readme",
+  "dependencies": {
+    "express": "^4.18.2",
+    "mongoose": "^7.2.0",
+    "nodemon": "^2.0.22"
+  }
+}
