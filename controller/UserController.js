@@ -1,6 +1,5 @@
 import { createUser } from "../services/crudService.js"
 
-
 const UserRegistraion = async (req, res) => {
    try {
       await createUser(req.body);
@@ -9,8 +8,6 @@ const UserRegistraion = async (req, res) => {
    catch (err) {
       res.json({ status: false, error: err.keyValue, message: err.message })
    }
-
-
 }
 
 
