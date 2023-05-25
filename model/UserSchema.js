@@ -3,8 +3,9 @@ import mongoose from "mongoose";
 const UserData = mongoose.Schema({
     username: {
         type: String,
-        require: true,
-       
+        require:true,
+        
+        
     },
     password: {
         type: String,
@@ -13,7 +14,7 @@ const UserData = mongoose.Schema({
     email:{
       type:String,
       require:true,
-      unique:true
+   
      }, 
     firstname: {
         type: String,
@@ -24,6 +25,5 @@ const UserData = mongoose.Schema({
 })
 
 const UserModel = new mongoose.model("client", UserData);
-
 export default UserModel
 
