@@ -1,4 +1,4 @@
-import { createUser } from "../services/crudService.js"
+import { createUser , LoginService } from "../services/crudService.js"
 
 const UserRegistraion = async (req, res) => {
    try {
@@ -11,9 +11,22 @@ const UserRegistraion = async (req, res) => {
 }
 
 
+const UserLogin = async(req ,res)=>{
+   const  requestData =await  req.body
+   try{
+    const loginID =await  LoginService(requestData) 
+    
+     res.json({status:true , message:"user login Successfully" , loginID})
+   }
+   catch(err){
+      res.json({status:false  , message:"user Login failed"})
+   }
+}
 
 
-export default UserRegistraion
+
+
+export  { UserRegistraion , UserLogin }
 
 
 

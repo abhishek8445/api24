@@ -19,9 +19,8 @@ const UserData = mongoose.Schema({
     },
     lastname: {
         type: String,
-        lowercase: true,
-        min: [2, "minimum 2 character fill"],
-        max: [10, 'max 10 character fill']
+  
+      
     }
 })
 

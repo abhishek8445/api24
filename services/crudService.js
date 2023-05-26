@@ -1,7 +1,7 @@
 import UserModel from "../model/UserSchema.js";
 import bcrypt from 'bcrypt'
 
-export async function createUser(data) {
+const createUser = async (data) => {
 
     const saltRound = 10;
     const { username, password, confirmPassword, email, firstname, lastname } = data
@@ -25,10 +25,28 @@ export async function createUser(data) {
     if (findUser) {
         throw new Error(`User Already Exist`)
     };
-
     const body = new UserModel(AlloverData);
     return await body.save();
 }
+
+const LoginService = async (requestData) => {
+    const { username, password, confirmPassword , lastname } = requestData
+
+        const data = await UserModel.findOne({ username: username})
+        console.log(matchpwd);
+        if (data){
+           
+                
+          return data.id   
+        }
+        else{
+            throw  new Error ('User alredy Registerd')
+        }   
+}
+
+
+
+export { createUser, LoginService }
 
 
 
