@@ -1,4 +1,4 @@
-import { createUser , LoginService } from "../services/crudService.js"
+import { createUser, LoginService, GetToken, DelteUserDetails } from "../services/crudService.js"
 
 const UserRegistraion = async (req, res) => {
    try {
@@ -11,26 +11,45 @@ const UserRegistraion = async (req, res) => {
 }
 
 
-const UserLogin = async(req ,res)=>{
-   const  requestData =await  req.body
-   try{
-    const loginID =await  LoginService(requestData) 
-    
-     res.json({status:true , message:"user login Successfully" , loginID})
+const UserLogin = async (req, res) => {
+   const requestData = await req.body
+   try {
+      const GetID = await LoginService(requestData)
+      res.json({ status: true, message: "user login Successfully", GetID })
    }
-   catch(err){
-      res.json({status:false  , message:"user Login failed"})
+   catch (err) {
+      res.json({ status: false, errkor: err.keyValue, message: err.message })
    }
 }
 
+const TokenAcess = async (req, res) => {
+   try {
+      const GetTokenByParams = await req.params.id
+      const UserDetails = await GetToken(GetTokenByParams)
+      res.json({ status: true, message: 'Acess token Successfully', UserData: UserDetails })
+   }
+   catch (err) {
+      res.json({ status: false, error: err.keyValue, message: err.message })
+   }
+}
 
+const DeleteUser = async (req, res) => {
+  
+   try {
+      const GetUserName = await req.params.username
+      DelteUserDetails(GetUserName)
+      res.json({ status: true, message: 'User Deleted Successfully' })
+   }
+   catch (err) {
+      res.json({ status: false, error: err.keyValue , message: err.message })
+   }
+}
 
+export { UserRegistraion, UserLogin, TokenAcess, DeleteUser }
 
-export  { UserRegistraion , UserLogin }
+ 
 
-
-
-
+ 
 
 
 

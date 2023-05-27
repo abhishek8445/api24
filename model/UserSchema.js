@@ -19,8 +19,7 @@ const UserData = mongoose.Schema({
     },
     lastname: {
         type: String,
-  
-      
+   
     }
 })
 
