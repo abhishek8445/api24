@@ -1,4 +1,5 @@
 import mongoose from "mongoose";
+import mongoosePaginate from 'mongoose-paginate'
 
 const UserData = mongoose.Schema({
     username: {
@@ -19,10 +20,26 @@ const UserData = mongoose.Schema({
     },
     lastname: {
         type: String,
-   
+
     }
 })
 
-const UserModel = new mongoose.model("client", UserData);
-export default UserModel
+const Token = mongoose.Schema({
+    user_id: {
+        type: String,
+    },
+    access_token: {
+        type: String
+    },
+    expireAt:  {
+        type: Date,
+     default: Date.now() + (1000 * 60 *  1 * 1 )
+    }
+})
 
+UserData.plugin(mongoosePaginate)
+
+const TokenModel = new mongoose.model("accessToken", Token);
+const UserModel = new mongoose.model("client", UserData);
+
+export  {UserModel , TokenModel }

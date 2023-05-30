@@ -1,5 +1,6 @@
-import UserModel from "../model/UserSchema.js";
+import { UserModel, TokenModel } from "../model/UserSchema.js";
 import bcrypt from 'bcrypt'
+import md5 from "md5";
 
 const createUser = async (data) => {
     const saltRound = 10;
@@ -32,17 +33,27 @@ const LoginService = async (requestData) => {
     const { username, password } = requestData
     try {
         const CheckUser = await UserModel.findOne({ username: username });
-        if (!CheckUser) throw Error(`Username not matched ${err}`)
-        const CheckPwd = await bcrypt.compare(password, UserModel.findOne({ password: password }))
+        if (!CheckUser) throw Error(`user not found`)
+        const CheckPwd = await bcrypt.compare(password, CheckUser.password)
         if (!CheckPwd) throw Error('password not matched')
-        return CheckUser.id
+        const CreateToken = Math.floor(Math.random() * 10);
+        const data = {
+            access_token: md5(CreateToken),
+            user_id: CheckUser._id
+        }
+        const FindID =await TokenModel.findOne({user_id:CheckUser.id})
+        if(!FindID){
+            throw new Error('Token Expired')
+        }
+        const Collection2 = TokenModel(data)
+         return  await Collection2.save();
+
     }
+
     catch (err) {
-        throw new Error(`User not Found ${err}`)
+        throw new Error(err)
     }
 }
-
-
 const GetToken = async (GetTokenByParams) => {
     try {
         const paramsID = await GetTokenByParams
@@ -58,17 +69,32 @@ const GetToken = async (GetTokenByParams) => {
 
 const DelteUserDetails = async (GetUserName) => {
     try {
-        const GetUserByParams = await UserModel.findOne({ username: GetUserName })
-        if (GetUserByParams) {    
-             await GetUserByParams.deleteOne()
+        const GetUserByParams = await UserModel.deleteOne({ username: GetUserName })
+        if (GetUserByParams.deletedCount == 0) {
+            throw new Error('USERNAME FALSE=====>')
         }
     }
     catch (err) {
-        throw new Error (`User not Deleted =====> ${err}`)
+        throw new Error(`User not Deleted =====> ${err}`)
+    }
+}
+const UserGetPagination = async (offset, limit) => {
+    try {
+        return await UserModel.paginate({}, { offset, limit }, function (err, result) {
+            if (err) {
+                throw new Error('pagination Error Page 1 ')
+            }
+            return result
+        })
+    }
+    catch (err) {
+        throw new Error(err)
     }
 }
 
-export { createUser, LoginService, GetToken, DelteUserDetails }
+
+
+export { createUser, LoginService, GetToken, DelteUserDetails, UserGetPagination }
 
 
 

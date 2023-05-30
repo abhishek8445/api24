@@ -1,4 +1,4 @@
-import { createUser, LoginService, GetToken, DelteUserDetails } from "../services/crudService.js"
+import { createUser, LoginService, GetToken, DelteUserDetails, UserGetPagination } from "../services/crudService.js"
 
 const UserRegistraion = async (req, res) => {
    try {
@@ -34,22 +34,35 @@ const TokenAcess = async (req, res) => {
 }
 
 const DeleteUser = async (req, res) => {
-  
    try {
       const GetUserName = await req.params.username
       DelteUserDetails(GetUserName)
       res.json({ status: true, message: 'User Deleted Successfully' })
    }
    catch (err) {
-      res.json({ status: false, error: err.keyValue , message: err.message })
+      res.json({ status: false, error: err.keyValue, message: err.message })
    }
 }
 
-export { UserRegistraion, UserLogin, TokenAcess, DeleteUser }
+const Pagination = async (req, res) => {
+   try {
+      const page = req.params.page
+      const limit = req.query.limit
+      const offset = page * limit - limit
+    const Data =   await UserGetPagination(offset, limit)
+      res.json({ status: true, message: 'User Pagination Successfully ' , Data })
+   }
 
- 
+   catch (err) {
+      res.json({ status: false, error: err.keyValue, message: err.message })
+   }
+}
 
- 
+export { UserRegistraion, UserLogin, TokenAcess, DeleteUser, Pagination, }
+
+
+
+
 
 
 
