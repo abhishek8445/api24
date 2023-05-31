@@ -1,4 +1,4 @@
-import { UserModel, TokenModel } from "../model/UserSchema.js";
+import { UserModel, TokenModel, AddressModel } from "../model/UserSchema.js";
 import bcrypt from 'bcrypt'
 import md5 from "md5";
 
@@ -36,24 +36,21 @@ const LoginService = async (requestData) => {
         if (!CheckUser) throw Error(`user not found`)
         const CheckPwd = await bcrypt.compare(password, CheckUser.password)
         if (!CheckPwd) throw Error('password not matched')
-        const CreateToken = Math.floor(Math.random() * 10);
+        const CreateToken = { username: CheckUser.username, _id: CheckUser._id }
         const data = {
             access_token: md5(CreateToken),
             user_id: CheckUser._id
         }
-        const FindID =await TokenModel.findOne({user_id:CheckUser.id})
-        if(!FindID){
-            throw new Error('Token Expired')
-        }
         const Collection2 = TokenModel(data)
-         return  await Collection2.save();
-
+        Collection2.save();
+        return data.user_id
     }
-
     catch (err) {
         throw new Error(err)
     }
 }
+
+
 const GetToken = async (GetTokenByParams) => {
     try {
         const paramsID = await GetTokenByParams
@@ -91,10 +88,29 @@ const UserGetPagination = async (offset, limit) => {
         throw new Error(err)
     }
 }
+const UserDetails = async (BodyData , GetParamsId) => {
+    try {
+   
+        const {user_id ,  address, city, state, pin_code, phone_no } = BodyData
+       
+           const AddressAllOverData = {
+            user_id : GetParamsId,
+            address:address,
+            city:city,
+            state:state,
+            pin_code:pin_code,
+            phone_no:phone_no
 
+           }
+        const SaveData = await AddressModel(AddressAllOverData)
+        SaveData.save()
+    }
+    catch (err) {
+        throw new Error(err);
+    }
+}
 
-
-export { createUser, LoginService, GetToken, DelteUserDetails, UserGetPagination }
+export { createUser, LoginService, GetToken, DelteUserDetails, UserGetPagination, UserDetails }
 
 
 

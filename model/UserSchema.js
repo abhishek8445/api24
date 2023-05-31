@@ -5,7 +5,6 @@ const UserData = mongoose.Schema({
     username: {
         type: String,
         require: true,
-
     },
     password: {
         type: String,
@@ -20,7 +19,6 @@ const UserData = mongoose.Schema({
     },
     lastname: {
         type: String,
-
     }
 })
 
@@ -30,16 +28,44 @@ const Token = mongoose.Schema({
     },
     access_token: {
         type: String
-    },
+     },
     expireAt:  {
         type: Date,
-     default: Date.now() + (1000 * 60 *  1 * 1 )
+     default: Date.now() + (1000 * 60 * 60)
     }
+},{
+    timestamps:true
 })
 
+
+const Address = ({
+      user_id:{
+        type:String,
+      },
+      address:{
+        type:String,
+      },
+      city:{
+        type:String,
+      },
+      state:{
+        type:String,
+      },
+      pin_code:{
+        type:Number
+      },
+      phone_no:{
+        type:Number
+      }
+
+
+})
 UserData.plugin(mongoosePaginate)
 
-const TokenModel = new mongoose.model("accessToken", Token);
-const UserModel = new mongoose.model("client", UserData);
 
-export  {UserModel , TokenModel }
+
+const UserModel = new mongoose.model("client", UserData);
+const TokenModel = new mongoose.model("accessToken", Token);
+const AddressModel = new mongoose.model('useraddress' ,  Address)
+
+export  {UserModel , TokenModel , AddressModel }
