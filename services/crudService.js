@@ -31,37 +31,29 @@ const createUser = async (data) => {
 
 const LoginService = async (requestData) => {
     const { username, password } = requestData
-    try {
-        const CheckUser = await UserModel.findOne({ username: username });
-        if (!CheckUser) throw Error(`user not found`)
-        const CheckPwd = await bcrypt.compare(password, CheckUser.password)
-        if (!CheckPwd) throw Error('password not matched')
-        const CreateToken = { username: CheckUser.username, _id: CheckUser._id }
-        const data = {
-            access_token: md5(CreateToken),
-            user_id: CheckUser._id
-        }
-        const Collection2 = TokenModel(data)
-        Collection2.save();
-        return data.user_id
+    const CheckUser = await UserModel.findOne({ username });
+    if (!CheckUser)
+        throw Error(`user not found`)
+    const CheckPwd = await bcrypt.compare(password, CheckUser.password)
+    if (!CheckPwd)
+        throw Error('password not matched')
+    const CreateToken = { username: CheckUser.username, _id: CheckUser._id }
+    const data = {
+        access_token: md5(CreateToken),
+        user_id: CreateToken._id
     }
-    catch (err) {
-        throw new Error(err)
-    }
+    const Collection2 = TokenModel(data)
+    Collection2.save();
+    return data
 }
 
-
-const GetToken = async (GetTokenByParams) => {
-    try {
-        const paramsID = await GetTokenByParams
-        const UserID = await UserModel.find({ _id: paramsID })
-        if (UserID) {
-            return UserID
-        }
+const getUser = async (user_id) => {
+    const UserID = await AddressModel.findOne({user_id}).populate('clients').exec();
+    console.log(UserID);
+    if (UserID) {
+        return UserID
     }
-    catch (err) {
-        throw new Error(`Access token is not matched ${err}`)
-    }
+    else throw new Error("User not found")
 }
 
 const DelteUserDetails = async (GetUserName) => {
@@ -88,29 +80,27 @@ const UserGetPagination = async (offset, limit) => {
         throw new Error(err)
     }
 }
-const UserDetails = async (BodyData , GetParamsId) => {
+const UserDetails = async (BodyData) => {
     try {
-   
-        const {user_id ,  address, city, state, pin_code, phone_no } = BodyData
-       
-           const AddressAllOverData = {
-            user_id : GetParamsId,
-            address:address,
-            city:city,
-            state:state,
-            pin_code:pin_code,
-            phone_no:phone_no
-
-           }
+        const { address, city, state, pin_code, phone_no, user_id } = BodyData
+        const AddressAllOverData = {
+            address: address,
+            city: city,
+            state: state,
+            pin_code: pin_code,
+            phone_no: phone_no,
+            user_id
+        }
         const SaveData = await AddressModel(AddressAllOverData)
         SaveData.save()
+    
     }
     catch (err) {
         throw new Error(err);
     }
 }
 
-export { createUser, LoginService, GetToken, DelteUserDetails, UserGetPagination, UserDetails }
+export { createUser, LoginService, getUser, DelteUserDetails, UserGetPagination, UserDetails }
 
 
 
