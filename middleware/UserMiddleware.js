@@ -9,6 +9,7 @@ const LoginMiddlewere = async (req, res, next) => {
         if (!findToken) {
             throw new Error("token not Found")
         }
+            req.user = findToken.user_id;
     }
     catch (err) {
         res.json({ status: false, error: err.keyValue, message: err.message })
