@@ -15,21 +15,11 @@ const UserRegistraion = async (req, res) => {
 const UserLogin = async (req, res) => {
    const requestData = await req.body
    try {
-      const login_access = await LoginService(requestData)
-      res.json({ status: true, message: "user login Successfully", login_access })
+      const Return_Token = await LoginService(requestData)
+      res.json({ status: true, message: "user login Successfully", Return_Token  })
    }
    catch (err) {
       res.json({ status: false, errkor: err.keyValue, message: err.message })
-   }
-}
-
-const UserProfile = async (req, res) => {
-   try {
-      res.json({ status: true, message: 'UserProfile  login Successfully' })
-   }
-   catch (err) {
-      res.json({ status: false, error: err.keyValue, message: err.message })
-
    }
 }
 
@@ -71,7 +61,7 @@ const Pagination = async (req, res) => {
 const UserAddress = async (req, res) => {
    try {
       const BodyData = req.body
-      await UserDetails({ ...BodyData, user_id: req.user })
+      await UserDetails({...BodyData , user_id:req.user})
       res.json({ statue: true, message: "User Details find Successfully" })
    }
    catch (err) {
@@ -79,7 +69,7 @@ const UserAddress = async (req, res) => {
    }
 }
 
-export { UserRegistraion, UserLogin, getUserData, DeleteUser, Pagination, UserProfile, UserAddress };
+export { UserRegistraion, UserLogin, getUserData, DeleteUser, Pagination,  UserAddress };
 
 
 

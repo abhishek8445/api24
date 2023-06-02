@@ -20,22 +20,20 @@ const UserData = mongoose.Schema({
   lastname: {
     type: String,
   },
-  _id: {
+  address:{                                             
     type: mongoose.Types.ObjectId, ref: 'useraddress'
-  },
+  },                                                                                  
 })
 UserData.plugin(mongoosePaginate)
 const UserModel = new mongoose.model("clients", UserData);
+
+
 const Token = mongoose.Schema({
   user_id: {
     type: String,
   },
   access_token: {
     type: String
-  },
-  expireAt: {
-    type: Date,
-    default: Date.now() + (1000 * 60 * 60)
   }
 }, {
   timestamps: true
@@ -61,10 +59,8 @@ const Address = ({
   },
   phone_no: {
     type: Number
-  },
+  }
 })
-
-
 const AddressModel = new mongoose.model('useraddress', Address)
 
 export { UserModel, TokenModel, AddressModel }

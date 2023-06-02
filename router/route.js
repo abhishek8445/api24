@@ -1,5 +1,5 @@
 import express from 'express';
-import { DeleteUser, Pagination, getUserData, UserAddress, UserLogin, UserProfile, UserRegistraion } from '../controller/UserController.js';
+import { DeleteUser, Pagination, getUserData, UserAddress, UserLogin,  UserRegistraion } from '../controller/UserController.js';
 import LoginMiddlewere from '../middleware/UserMiddleware.js';
 
 
@@ -11,8 +11,8 @@ router.post('/login', UserLogin)
 router.get('/get', LoginMiddlewere, getUserData)
 router.put('/delete/:username', DeleteUser)
 router.get('/list/:page', Pagination)
-router.post('/login/profile', LoginMiddlewere, UserProfile)
 router.post('/address/', LoginMiddlewere, UserAddress)
+
 
 
 
