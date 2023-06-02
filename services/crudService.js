@@ -1,6 +1,7 @@
-import { UserModel, TokenModel, AddressModel } from "../model/UserSchema.js";
+import { UserModel, TokenModel, AddressModel } from "../model/UserSchema.js"
 import bcrypt from 'bcrypt'
 import md5 from "md5";
+import jwt from 'jsonwebtoken'
 
 const createUser = async (data) => {
     const saltRound = 10;
@@ -30,29 +31,28 @@ const createUser = async (data) => {
 
 
 const LoginService = async (requestData) => {
+    const SECRET_KEY = 'secret_key'
     const { username, password } = requestData
     const CheckUser = await UserModel.findOne({ username });
-    if (!CheckUser)
-        throw Error(`user not found`)
+
+    if (!CheckUser) throw Error(`user not found`)
     const CheckPwd = await bcrypt.compare(password, CheckUser.password)
-    if (!CheckPwd)
-        throw Error('password not matched')
-    const CreateToken = { username: CheckUser.username, _id: CheckUser._id }
-    const data = {
-        access_token: md5(CreateToken),
-        user_id: CreateToken._id
+    if (!CheckPwd) throw Error('password not matched')
+    const jwt_token = jwt.sign({ CheckUser }, SECRET_KEY, { expiresIn: '60s'})
+    const Save_token = {
+        access_token: jwt_token,
+        user_id: CheckUser._id
     }
-    const Collection2 = TokenModel(data)
+    const Collection2 = TokenModel(Save_token)
     Collection2.save();
-    return data
+    return Save_token
 }
 
 const getUser = async (user_id) => {
-    const UserID = await AddressModel.findOne({user_id}).populate('clients').exec();
-    console.log(UserID);
+    const UserID = await AddressModel.findOne({user_id}).populate('user_id').exec();
     if (UserID) {
         return UserID
-    }
+    }                                                 
     else throw new Error("User not found")
 }
 
@@ -82,18 +82,18 @@ const UserGetPagination = async (offset, limit) => {
 }
 const UserDetails = async (BodyData) => {
     try {
-        const { address, city, state, pin_code, phone_no, user_id } = BodyData
+        const { address, city, state, pin_code, phone_no ,user_id } = BodyData
         const AddressAllOverData = {
-            address: address,
-            city: city,
-            state: state,
-            pin_code: pin_code,
-            phone_no: phone_no,
+            address,
+            city,
+            state,
+            pin_code,
+            phone_no,  
             user_id
         }
         const SaveData = await AddressModel(AddressAllOverData)
         SaveData.save()
-    
+
     }
     catch (err) {
         throw new Error(err);
