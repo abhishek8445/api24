@@ -1,19 +1,18 @@
 import express from 'express';
-import{ UserRegistraion ,UserLogin  ,TokenAcess ,DeleteUser ,Pagination ,UserProfile , UserAddress}from '../controller/UserController.js';
- import LoginMiddlewere from '../middleware/UserMiddleware.js';
+import { DeleteUser, Pagination, getUserData, UserAddress, UserLogin,  UserRegistraion } from '../controller/UserController.js'; 
+import UserAuth from '../Authentication/UserAuth.js';
+import LoginMiddlewere from '../middleware/UserMiddleware.js'
 
-
-
+import passport from "passport"
+UserAuth(passport)
 const router = express.Router()
 
 router.post('/register', UserRegistraion)
-router.post('/login' , UserLogin)
-router.get('/get/:id', TokenAcess)
+router.post('/login',  UserLogin)
+router.get('/get' , passport.authenticate('jwt', { session: false }),  getUserData)
 router.put('/delete/:username', DeleteUser)
-router.get('/list/:page', Pagination )
-router.post('/login/profile/:token' , LoginMiddlewere , UserProfile )
-router.post('/address/:id' ,LoginMiddlewere , UserAddress )
-
+router.get('/list/:page', Pagination)
+router.post('/address/', LoginMiddlewere, UserAddress)
 
 
 

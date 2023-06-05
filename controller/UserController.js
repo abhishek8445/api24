@@ -1,5 +1,5 @@
 
-import { createUser, LoginService, GetToken, DelteUserDetails, UserGetPagination  ,UserDetails } from "../services/crudService.js"
+import { DelteUserDetails,  UserDetails, UserGetPagination,   LoginService ,createUser, getUser } from "../services/crudService.js";
 
 const UserRegistraion = async (req, res) => {
    try {
@@ -13,33 +13,23 @@ const UserRegistraion = async (req, res) => {
 
 
 const UserLogin = async (req, res) => {
-   const requestData = await req.body
+   const data = await LoginService(req.body)
    try {
-      const user_id = await LoginService(requestData)
-      res.json({ status: true, message: "user login Successfully", user_id })
+      res.json({ status: true, message: "user login Successfully" ,data })
    }
    catch (err) {
-      res.json({ status: false, errkor: err.keyValue, message: err.message })
-   }
-}
-const UserProfile = async (req, res) => {
-   try {
-      res.json({ status: true, message: 'UserProfile  login Successfully' })
-   }
-   catch (err) {
-      // res.json({ status: false, error: err.keyValue, message: err.message  })
-      console.log('Error');
-     
+      res.json({ status: false, error: err.keyValue, message: err.message })
    }
 }
 
-const TokenAcess = async (req, res) => {
+const getUserData = async (req, res) => {
    try {
-      const GetTokenByParams = await req.params.id
-      const UserDetails = await GetToken(GetTokenByParams)
-      res.json({ status: true, message: 'Acess token Successfully', UserData: UserDetails })
+      const user_id = req.user;
+      const UserDetails = await getUser(user_id)
+      res.json({ status: true, message: 'Get data successfull', UserDetails })
    }
    catch (err) {
+   
       res.json({ status: false, error: err.keyValue, message: err.message })
    }
 }
@@ -47,7 +37,7 @@ const TokenAcess = async (req, res) => {
 const DeleteUser = async (req, res) => {
    try {
       const GetUserName = await req.params.username
-    await  DelteUserDetails(GetUserName)
+      await DelteUserDetails(GetUserName)
       res.json({ status: true, message: 'User Deleted Successfully' })
    }
    catch (err) {
@@ -68,19 +58,18 @@ const Pagination = async (req, res) => {
    }
 }
 
-const UserAddress = async (req , res)=>{
-       try{
-      const GetParamsId = req.params.id
+const UserAddress = async (req, res) => {
+   try {
       const BodyData = req.body
-      await  UserDetails(BodyData , GetParamsId)
-      res.json({statue:true , message:"User Details find Successfully"})
-     }
-     catch(err){
-      // res.json({statue:false , error:err.keyValue ,message:err.message})
-     }
+      await UserDetails({...BodyData , user_id:req.user})
+      res.json({ statue: true, message: "User Details find Successfully" })
+   }
+   catch (err) {
+      res.json({ statue: false, error: err.keyValue, message: err.message })
+   }
 }
 
-export { UserRegistraion, UserLogin, TokenAcess, DeleteUser, Pagination, UserProfile , UserAddress }
+export { UserRegistraion, UserLogin, getUserData, DeleteUser, Pagination,  UserAddress };
 
 
 
