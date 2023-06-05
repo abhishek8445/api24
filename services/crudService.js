@@ -1,7 +1,8 @@
 import { UserModel, TokenModel, AddressModel } from "../model/UserSchema.js"
 import bcrypt from 'bcrypt'
-import md5 from "md5";
-import jwt from 'jsonwebtoken'
+import jwt from "jsonwebtoken"
+
+
 
 const createUser = async (data) => {
     const saltRound = 10;
@@ -28,24 +29,23 @@ const createUser = async (data) => {
     const body = new UserModel(AlloverData);
     return await body.save();
 }
-
-
 const LoginService = async (requestData) => {
-    const SECRET_KEY = 'secret_key'
+
     const { username, password } = requestData
     const CheckUser = await UserModel.findOne({ username });
-
     if (!CheckUser) throw Error(`user not found`)
     const CheckPwd = await bcrypt.compare(password, CheckUser.password)
-    if (!CheckPwd) throw Error('password not matched')
-    const jwt_token = jwt.sign({ CheckUser }, SECRET_KEY, { expiresIn: '60s'})
+    if (!CheckPwd) throw   Error('password not matched')
+    const jwt_token =  jwt.sign({ CheckUser }, process.env.SECRET_KEY , { expiresIn: '60s'})
     const Save_token = {
         access_token: jwt_token,
         user_id: CheckUser._id
     }
     const Collection2 = TokenModel(Save_token)
     Collection2.save();
-    return Save_token
+   return Save_token
+   
+
 }
 
 const getUser = async (user_id) => {
@@ -101,7 +101,4 @@ const UserDetails = async (BodyData) => {
 }
 
 export { createUser, LoginService, getUser, DelteUserDetails, UserGetPagination, UserDetails }
-
-
-
 

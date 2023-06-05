@@ -1,5 +1,5 @@
 
-import { DelteUserDetails, LoginService, UserDetails, UserGetPagination, createUser, getUser } from "../services/crudService.js";
+import { DelteUserDetails,  UserDetails, UserGetPagination,   LoginService ,createUser, getUser } from "../services/crudService.js";
 
 const UserRegistraion = async (req, res) => {
    try {
@@ -13,13 +13,12 @@ const UserRegistraion = async (req, res) => {
 
 
 const UserLogin = async (req, res) => {
-   const requestData = await req.body
+   const data = await LoginService(req.body)
    try {
-      const Return_Token = await LoginService(requestData)
-      res.json({ status: true, message: "user login Successfully", Return_Token  })
+      res.json({ status: true, message: "user login Successfully" ,data })
    }
    catch (err) {
-      res.json({ status: false, errkor: err.keyValue, message: err.message })
+      res.json({ status: false, error: err.keyValue, message: err.message })
    }
 }
 
@@ -30,6 +29,7 @@ const getUserData = async (req, res) => {
       res.json({ status: true, message: 'Get data successfull', UserDetails })
    }
    catch (err) {
+   
       res.json({ status: false, error: err.keyValue, message: err.message })
    }
 }
