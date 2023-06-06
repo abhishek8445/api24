@@ -1,5 +1,5 @@
 
-import { DelteUserDetails,  UserDetails, UserGetPagination,   LoginService ,createUser, getUser } from "../services/crudService.js";
+import { DelteUserDetails, UserDetails, UserGetPagination, LoginService, createUser, getUser, AddressDelete, UserForgotPwd } from "../services/crudService.js";
 
 const UserRegistraion = async (req, res) => {
    try {
@@ -13,9 +13,10 @@ const UserRegistraion = async (req, res) => {
 
 
 const UserLogin = async (req, res) => {
-   const data = await LoginService(req.body)
+   const requestData = req.body
+   const data = await LoginService(requestData)
    try {
-      res.json({ status: true, message: "user login Successfully" ,data })
+      res.json({ status: true, message: "user login Successfully", data })
    }
    catch (err) {
       res.json({ status: false, error: err.keyValue, message: err.message })
@@ -29,7 +30,6 @@ const getUserData = async (req, res) => {
       res.json({ status: true, message: 'Get data successfull', UserDetails })
    }
    catch (err) {
-   
       res.json({ status: false, error: err.keyValue, message: err.message })
    }
 }
@@ -61,15 +61,47 @@ const Pagination = async (req, res) => {
 const UserAddress = async (req, res) => {
    try {
       const BodyData = req.body
-      await UserDetails({...BodyData , user_id:req.user})
-      res.json({ statue: true, message: "User Details find Successfully" })
+      await UserDetails({ ...BodyData, user_id: req.user })
+      res.json({ statue: true, message: "User Details Saved Successfully" })
    }
    catch (err) {
       res.json({ statue: false, error: err.keyValue, message: err.message })
    }
 }
 
-export { UserRegistraion, UserLogin, getUserData, DeleteUser, Pagination,  UserAddress };
+const UserAddressDelete = async (req, res) => {
+   try {
+      const BodyID = req.body
+      await AddressDelete(BodyID)
+      res.json({ statue: true, message: "Adress Deleted  Successfully" })
+   }
+   catch (err) {
+      res.json({ statue: false, error: err.keyValue, message: err.message })
+   }
+}
+
+const ForgotPwd = async (req, res) => {
+   try {
+      const GetEmailByBody = req.body.email
+      await UserForgotPwd(GetEmailByBody)
+
+      res.json({ status: true, message: "Verify User Successfully By Email  " })
+   }
+   catch (err) {
+      res.json({ status: false, error: err.keyValue, message: err.message })
+   }
+}
+
+const  VerifyPwd = async (req ,res)=>{
+       try{
+          res.json({status:true , message:"Password Reset SuccessFully"})
+       }
+       catch(err){
+          res.json({status:false , error:err.keyValue , message:err.message})
+       }
+}
+
+export { UserRegistraion, UserLogin, getUserData, DeleteUser, Pagination, UserAddress, UserAddressDelete, ForgotPwd, VerifyPwd };
 
 
 

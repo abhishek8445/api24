@@ -34,7 +34,11 @@ const Token = mongoose.Schema({
   },
   access_token: {
     type: String
-  }
+  },
+  expireAt:  {
+    type: Date,
+ default: Date.now() + (1000 * 60 * 60)
+}
 }, {
   timestamps: true
 })
@@ -63,4 +67,21 @@ const Address = ({
 })
 const AddressModel = new mongoose.model('useraddress', Address)
 
-export { UserModel, TokenModel, AddressModel }
+const PwdSchema = mongoose.Schema({
+  user_id:{
+    type:String,
+  },
+  pwd_token :{
+    type:String, 
+  },
+  expireAt:  {
+    type: Date,
+ default: Date.now() + (1000 * 60 * 60)
+}
+},{ 
+    timestamps: true
+})
+
+const Pwdmodel = new mongoose.model("pwd_token", PwdSchema )
+
+export { UserModel, TokenModel, AddressModel , Pwdmodel }

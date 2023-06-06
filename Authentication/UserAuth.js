@@ -1,28 +1,26 @@
 import { UserModel } from "../model/UserSchema.js";
-import passport from "passport";
-import { Strategy, ExtractJwt } from "passport-jwt";
+import { Strategy as JwtStrategy, ExtractJwt } from 'passport-jwt';
 import dotenv from "dotenv"
 dotenv.config()
 
-const UserAuth = async (req, res, next) => {
-  const opts = {}
+const opts = {}
   opts.jwtFromRequest = ExtractJwt.fromAuthHeaderAsBearerToken();
   opts.secretOrKey = process.env.SECRET_KEY;
- 
+const passportConfig =  new JwtStrategy(opts, async (jwt_payload, done) => {
   
-  passport.use(new Strategy(opts, (jwt_playload, done) => {
-    
-    UserModel.findone({ id: jwt_playload.sub }, function (err , data) {
-      if (err) {
-        return done(err, false);
+try{
+  const user = await UserModel.findOne({_id:jwt_payload.CheckUser._id})
+        if (user) {
+            return done(null, user);
+        } else {
+            return done(null, false);
+        }
     }
-    if (data) {
-        return done(null, data);
-    } else {
-        return done(null, false);
-    }})
-    
-  }))
-}
+    catch(err){
+      return err
+    }
+})
 
-export default UserAuth
+export default passportConfig;
+
+
