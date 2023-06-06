@@ -1,6 +1,8 @@
-import { UserModel, TokenModel, AddressModel } from "../model/UserSchema.js";
+import { UserModel, TokenModel, AddressModel , Pwdmodel } from "../model/UserSchema.js"
 import bcrypt from 'bcrypt'
-import md5 from "md5";
+import jwt from "jsonwebtoken"
+
+
 
 const createUser = async (data) => {
     const saltRound = 10;
@@ -27,41 +29,39 @@ const createUser = async (data) => {
     const body = new UserModel(AlloverData);
     return await body.save();
 }
-
-
-const LoginService = async (requestData) => {
+const LoginService = async(requestData) => {
+   try{
     const { username, password } = requestData
-    try {
-        const CheckUser = await UserModel.findOne({ username: username });
-        if (!CheckUser) throw Error(`user not found`)
-        const CheckPwd = await bcrypt.compare(password, CheckUser.password)
-        if (!CheckPwd) throw Error('password not matched')
-        const CreateToken = { username: CheckUser.username, _id: CheckUser._id }
-        const data = {
-            access_token: md5(CreateToken),
-            user_id: CheckUser._id
-        }
-        const Collection2 = TokenModel(data)
-        Collection2.save();
-        return data.user_id
+    const CheckUser = await UserModel.findOne({ username });
+    if (!CheckUser) { 
+        throw new Error(`user not found`)
     }
-    catch (err) {
-        throw new Error(err)
+    const CheckPwd = await bcrypt.compare(password, CheckUser.password)
+    if (!CheckPwd){
+         throw  new  Error('password not matched')
     }
+    const jwt_token =  jwt.sign({ CheckUser }, process.env.SECRET_KEY , { expiresIn: '120s'})
+    const Save_token = {
+        access_token: jwt_token,
+        user_id: CheckUser._id   
+    }
+    const Collection2 = await  TokenModel(Save_token);
+    Collection2.save();
+   return Save_token
+   }
+   catch(err){
+  
+    throw   Error (`USER LOGIN FAILED ====> ${err}`)
+   }
 }
 
-
-const GetToken = async (GetTokenByParams) => {
-    try {
-        const paramsID = await GetTokenByParams
-        const UserID = await UserModel.find({ _id: paramsID })
-        if (UserID) {
-            return UserID
-        }
-    }
-    catch (err) {
-        throw new Error(`Access token is not matched ${err}`)
-    }
+const getUser = async (user_id) => {
+    const UserID = await AddressModel.findOne({user_id}).populate('user_id').exec();
+   
+    if (UserID) {
+        return UserID
+    }                                                 
+    else throw new Error("User not found")
 }
 
 const DelteUserDetails = async (GetUserName) => {
@@ -88,20 +88,17 @@ const UserGetPagination = async (offset, limit) => {
         throw new Error(err)
     }
 }
-const UserDetails = async (BodyData , GetParamsId) => {
+const UserDetails = async (BodyData) => {
     try {
-   
-        const {user_id ,  address, city, state, pin_code, phone_no } = BodyData
-       
-           const AddressAllOverData = {
-            user_id : GetParamsId,
-            address:address,
-            city:city,
-            state:state,
-            pin_code:pin_code,
-            phone_no:phone_no
-
-           }
+        const { address, city, state, pin_code, phone_no ,user_id } = BodyData
+        const AddressAllOverData = {
+            address,
+            city,
+            state,
+            pin_code,
+            phone_no,  
+            user_id
+        }
         const SaveData = await AddressModel(AddressAllOverData)
         SaveData.save()
     }
@@ -109,9 +106,41 @@ const UserDetails = async (BodyData , GetParamsId) => {
         throw new Error(err);
     }
 }
+const AddressDelete =async (BodyData)=>{ 
+ try{
+  const FindData = await AddressModel.deleteMany({user_id:BodyData.user_ids})
+  console.log(BodyData);
+   if (FindData.deletedCount == 0) {
+    throw new Error('USERID INVALID FALSE=====>')
+}
+ }
+ catch(err){
+        throw  new Error(`Address Data  not deleted ${err}`)
+ }
+}
 
-export { createUser, LoginService, GetToken, DelteUserDetails, UserGetPagination, UserDetails }
+const UserForgotPwd = async (GetEmailByBody)=>{
+  try{
+    const VerifyEmail = await UserModel.findOne({email:GetEmailByBody})
+     if(!VerifyEmail){
+        throw Error ('Email-Id is Invalid')
+     }
 
+     const Pwd_Token = jwt.sign({VerifyEmail}, process.env.SECRET_KEY , {expiresIn:"60s"}) 
+     const SavePwdTowken = {
+        user_id : VerifyEmail._id,
+        pwd_token :  Pwd_Token 
+     }
+    const PwdCollection = await Pwdmodel(SavePwdTowken)
+    PwdCollection.save() 
+    return SavePwdTowken
 
+  }
+  catch(err){
+    throw new Error (`${err}===========>`)
+  }
+    
+}
+export { createUser, LoginService, getUser, DelteUserDetails, UserGetPagination, UserDetails ,AddressDelete , UserForgotPwd}
 
 

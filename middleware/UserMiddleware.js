@@ -1,19 +1,29 @@
+
 import { TokenModel } from "../model/UserSchema.js";
 const LoginMiddlewere = async (req, res, next) => {
-    try {
+    const bearerHeader = req.headers['authorization']
+    const bearer = bearerHeader.split(" ")
+    const token = bearer[1]
 
-        const Bearer = req.headers['authorization']
-        const GetToken = Bearer.substring(7, Bearer.length)
-
-        const findToken = await TokenModel.findOne({ access_token: GetToken })
-        if (!findToken) {
-            throw new Error("token not Found")
+    const findToken = await TokenModel.findOne({ access_token: token })
+    if (!findToken) {
+     res.json({status:false , message:"token not found"})
+    }
+    else{
+        req.user = findToken.user_id
+        next()
         }
-    }
-    catch (err) {
-        res.json({ status: false, error: err.keyValue, message: err.message })
-    }
-    next()
-}
+       
+  
+}   
 
 export default LoginMiddlewere
+
+
+
+
+
+
+
+
+
