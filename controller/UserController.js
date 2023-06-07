@@ -1,5 +1,5 @@
 
-import { DelteUserDetails, UserDetails, UserGetPagination, LoginService, createUser, getUser, AddressDelete, UserForgotPwd } from "../services/crudService.js";
+import { DelteUserDetails, UserDetails, UserGetPagination, LoginService, createUser, getUser, AddressDelete, UserForgotPwd, ResetPwd } from "../services/crudService.js";
 
 const UserRegistraion = async (req, res) => {
    try {
@@ -10,7 +10,6 @@ const UserRegistraion = async (req, res) => {
       res.json({ status: false, error: err.keyValue, message: err.message })
    }
 }
-
 
 const UserLogin = async (req, res) => {
    const requestData = req.body
@@ -83,25 +82,40 @@ const UserAddressDelete = async (req, res) => {
 const ForgotPwd = async (req, res) => {
    try {
       const GetEmailByBody = req.body.email
-      await UserForgotPwd(GetEmailByBody)
-
-      res.json({ status: true, message: "Verify User Successfully By Email  " })
+      const RetutrnPwdToken = await UserForgotPwd(GetEmailByBody);
+      res.json({ status: true, message: "Verify User Successfully By Email", RetutrnPwdToken })
    }
    catch (err) {
       res.json({ status: false, error: err.keyValue, message: err.message })
    }
 }
 
-const  VerifyPwd = async (req ,res)=>{
-       try{
-          res.json({status:true , message:"Password Reset SuccessFully"})
-       }
-       catch(err){
-          res.json({status:false , error:err.keyValue , message:err.message})
-       }
+const VerifyPwd = async (req, res) => {
+   try {
+      const SendToken =  req.token.pwd_token
+      const SendPwd = req.body
+      await ResetPwd({...SendPwd , SendToken})
+      res.json({ status: true, message: "Password Reset SuccessFully" })
+   }
+   catch (err) {
+      res.json({ status: false, error: err.keyValue, message: err.message })
+
+   }
 }
 
-export { UserRegistraion, UserLogin, getUserData, DeleteUser, Pagination, UserAddress, UserAddressDelete, ForgotPwd, VerifyPwd };
+const UploadProfile = async (req, res) => {
+   try {
+      // console.log(req.file);
+      res.json({ status: true, message: "Profile Image Upload Successfully" })
+   }
+   catch (err) { 
+      res.json({ status: false, error: err.keyValue, message: err.message })
+   }
+}
+
+
+export { UserRegistraion, UserLogin, getUserData, DeleteUser, Pagination, UserAddress, UserAddressDelete, ForgotPwd, VerifyPwd, UploadProfile };
+
 
 
 

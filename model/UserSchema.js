@@ -76,7 +76,7 @@ const PwdSchema = mongoose.Schema({
   },
   expireAt:  {
     type: Date,
- default: Date.now() + (1000 * 60 * 60)
+ default: Date.now() + (1000 * 60 )
 }
 },{ 
     timestamps: true
