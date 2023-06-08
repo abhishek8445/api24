@@ -1,6 +1,21 @@
 import { UserModel, TokenModel, AddressModel, Pwdmodel } from "../model/UserSchema.js"
 import bcrypt from 'bcrypt'
 import jwt from "jsonwebtoken"
+import cloudinary from 'cloudinary'
+import UseCloudinary from "../middleware/cloudinary.js"
+import upload from "../middleware/multer.js"
+
+import multer from "multer"
+
+
+
+// const upload  = multer({
+//     dest:'image' ,
+//     limits:50000,
+//     preservePath:true,
+//     filename: 'my-img',
+    
+// }) 
 
 
 
@@ -29,6 +44,7 @@ const createUser = async (data) => {
     const body = new UserModel(AlloverData);
     return await body.save();
 }
+
 const LoginService = async (requestData) => {
     try {
         const { username, password } = requestData
@@ -54,6 +70,7 @@ const LoginService = async (requestData) => {
         throw Error(`USER LOGIN FAILED ====> ${err}`)
     }
 }
+
 const getUser = async (user_id) => {
     const UserID = await AddressModel.findOne({ user_id }).populate('user_id').exec();
 
@@ -62,6 +79,7 @@ const getUser = async (user_id) => {
     }
     else throw new Error("User not found")
 }
+
 const DelteUserDetails = async (GetUserName) => {
     try {
         const GetUserByParams = await UserModel.deleteOne({ username: GetUserName })
@@ -73,6 +91,7 @@ const DelteUserDetails = async (GetUserName) => {
         throw new Error(`User not Deleted =====> ${err}`)
     }
 }
+
 const UserGetPagination = async (offset, limit) => {
     try {
         return await UserModel.paginate({}, { offset, limit }, function (err, result) {
@@ -152,14 +171,18 @@ const ResetPwd = async (SendPwd) => {
             const UpdatePwd = await UserModel.updateOne({ email: "varsha@gmail.com" }, { password : BycrptPwd })
             const DeleteToken  =await Pwdmodel.deleteOne({pwd_token:SendToken})
         }
-
     }
     catch (err) {
         throw new Error(err)
     }
 }
 
+const UploadCloudinary =  (FilePath) =>{
+    cloudinary.v2.uploader.upload(FilePath,(error, result)=>{
+        console.log(result, error);
+});
+}
 
-export { createUser, LoginService, getUser, DelteUserDetails, UserGetPagination, UserDetails, AddressDelete, UserForgotPwd, ResetPwd }
+export { createUser, LoginService, getUser, DelteUserDetails,UploadCloudinary, UserGetPagination, UserDetails, AddressDelete, UserForgotPwd, ResetPwd }
 
 

@@ -1,5 +1,6 @@
 
-import { DelteUserDetails, UserDetails, UserGetPagination, LoginService, createUser, getUser, AddressDelete, UserForgotPwd, ResetPwd } from "../services/crudService.js";
+import { DelteUserDetails, UserDetails, UserGetPagination, LoginService, createUser, getUser, AddressDelete, UserForgotPwd, ResetPwd  ,UploadCloudinary} from "../services/crudService.js";
+
 
 const UserRegistraion = async (req, res) => {
    try {
@@ -22,7 +23,7 @@ const UserLogin = async (req, res) => {
    }
 }
 
-const getUserData = async (req, res) => {
+const getUserData = async (req, res) => { 
    try {
       const user_id = req.user;
       const UserDetails = await getUser(user_id)
@@ -104,17 +105,27 @@ const VerifyPwd = async (req, res) => {
 }
 
 const UploadProfile = async (req, res) => {
+   console.log(req.file);
    try {
-      // console.log(req.file);
       res.json({ status: true, message: "Profile Image Upload Successfully" })
-   }
+   } 
    catch (err) { 
       res.json({ status: false, error: err.keyValue, message: err.message })
    }
 }
 
+const UploadOnline = async (req ,res )=>{
+try{
+    const FilePath =  req.file.path
+   const data =   await UploadCloudinary(FilePath)
+   res.json({status:true , message:"Upload Online Successfully",data })
+}
+catch(err){
+   res.json({status:false ,error:err.keyValue , message:err.message})
+}
+}
 
-export { UserRegistraion, UserLogin, getUserData, DeleteUser, Pagination, UserAddress, UserAddressDelete, ForgotPwd, VerifyPwd, UploadProfile };
+export { UserRegistraion, UserLogin, getUserData, DeleteUser, Pagination, UserAddress, UserAddressDelete, ForgotPwd, VerifyPwd, UploadProfile ,UploadOnline };
 
 
 
