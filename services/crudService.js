@@ -1,23 +1,12 @@
 import { UserModel, TokenModel, AddressModel, Pwdmodel } from "../model/UserSchema.js"
+import SendMail from "./MailService.js"
 import bcrypt from 'bcrypt'
 import jwt from "jsonwebtoken"
 import cloudinary from 'cloudinary'
-import UseCloudinary from "../middleware/cloudinary.js"
-import upload from "../middleware/multer.js"
-
-import multer from "multer"
-
-
-
-// const upload  = multer({
-//     dest:'image' ,
-//     limits:50000,
-//     preservePath:true,
-//     filename: 'my-img',
-    
-// }) 
-
-
+import nodemailer from "nodemailer"
+import google from "googleapis"
+import dotenv from "dotenv"
+dotenv.config()
 
 const createUser = async (data) => {
     const saltRound = 10;
@@ -26,6 +15,11 @@ const createUser = async (data) => {
     if (UserFind) {
         throw new Error(`email already exists`);
     }
+    const findUser = await UserModel.findOne({ username: username })
+    if (findUser) {
+        throw new Error(`User Already Exist`)
+    };
+
     if (password !== confirmPassword) {
         throw new Error("password not matched")
     }
@@ -37,13 +31,15 @@ const createUser = async (data) => {
         firstname: firstname,
         lastname: lastname
     }
-    const findUser = await UserModel.findOne({ username: username })
-    if (findUser) {
-        throw new Error(`User Already Exist`)
-    };
     const body = new UserModel(AlloverData);
-    return await body.save();
-}
+    await body.save();
+    
+
+    const GenrateToken = jwt.sign({ AlloverData }, process.env.SECRET_KEY, { expiresIn: '120s' }); 
+    const url = `${process.env.BASE_URL}/:${body._id}/verify/${GenrateToken}`
+    const Email = body.email            
+    SendMail(Email ,url)              
+} 
 
 const LoginService = async (requestData) => {
     try {
@@ -61,6 +57,8 @@ const LoginService = async (requestData) => {
             access_token: jwt_token,
             user_id: CheckUser._id
         }
+
+
         const Collection2 = await TokenModel(Save_token);
         Collection2.save();
         return Save_token
@@ -161,15 +159,15 @@ const UserForgotPwd = async (GetEmailByBody) => {
 const ResetPwd = async (SendPwd) => {
     try {
 
-        const { password, confirm_password , SendToken } = SendPwd
+        const { password, confirm_password, SendToken } = SendPwd
         if (password !== confirm_password) {
             throw Error('Password Not Matched')
         }
         else {
             const saltRound = 10;
-            const BycrptPwd = await  bcrypt.hash(password ,saltRound )
-            const UpdatePwd = await UserModel.updateOne({ email: "varsha@gmail.com" }, { password : BycrptPwd })
-            const DeleteToken  =await Pwdmodel.deleteOne({pwd_token:SendToken})
+            const BycrptPwd = await bcrypt.hash(password, saltRound)
+            const UpdatePwd = await UserModel.updateOne({ email: "varsha@gmail.com" }, { password: BycrptPwd })
+            const DeleteToken = await Pwdmodel.deleteOne({ pwd_token: SendToken })
         }
     }
     catch (err) {
@@ -177,12 +175,19 @@ const ResetPwd = async (SendPwd) => {
     }
 }
 
-const UploadCloudinary =  (FilePath) =>{
-    cloudinary.v2.uploader.upload(FilePath,(error, result)=>{
-        console.log(result, error);
-});
+const UploadCloudinary = (FilePath) => {
+    cloudinary.v2.uploader.upload(FilePath, (error, result) => {
+        if (error) {
+            throw new Error("Profile Upload Failed")
+        }
+        else {
+            const data = result.secure_url
+            console.log(data);
+        }
+    });
+
 }
 
-export { createUser, LoginService, getUser, DelteUserDetails,UploadCloudinary, UserGetPagination, UserDetails, AddressDelete, UserForgotPwd, ResetPwd }
+export { createUser, LoginService, getUser, DelteUserDetails, UploadCloudinary, UserGetPagination, UserDetails, AddressDelete, UserForgotPwd, ResetPwd }
 
 

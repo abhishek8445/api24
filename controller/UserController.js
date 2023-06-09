@@ -1,5 +1,7 @@
 
-import { DelteUserDetails, UserDetails, UserGetPagination, LoginService, createUser, getUser, AddressDelete, UserForgotPwd, ResetPwd  ,UploadCloudinary} from "../services/crudService.js";
+import { UserModel } from "../model/UserSchema.js";
+import { DelteUserDetails, UserDetails, UserGetPagination, LoginService, createUser, getUser, AddressDelete, UserForgotPwd, ResetPwd, UploadCloudinary } from "../services/crudService.js";
+import SendMail from "../services/MailService.js";
 
 
 const UserRegistraion = async (req, res) => {
@@ -23,7 +25,7 @@ const UserLogin = async (req, res) => {
    }
 }
 
-const getUserData = async (req, res) => { 
+const getUserData = async (req, res) => {
    try {
       const user_id = req.user;
       const UserDetails = await getUser(user_id)
@@ -93,9 +95,9 @@ const ForgotPwd = async (req, res) => {
 
 const VerifyPwd = async (req, res) => {
    try {
-      const SendToken =  req.token.pwd_token
+      const SendToken = req.token.pwd_token
       const SendPwd = req.body
-      await ResetPwd({...SendPwd , SendToken})
+      await ResetPwd({ ...SendPwd, SendToken })
       res.json({ status: true, message: "Password Reset SuccessFully" })
    }
    catch (err) {
@@ -108,24 +110,60 @@ const UploadProfile = async (req, res) => {
    console.log(req.file);
    try {
       res.json({ status: true, message: "Profile Image Upload Successfully" })
-   } 
-   catch (err) { 
+   }
+   catch (err) {
       res.json({ status: false, error: err.keyValue, message: err.message })
    }
 }
 
-const UploadOnline = async (req ,res )=>{
-try{
-    const FilePath =  req.file.path
-   const data =   await UploadCloudinary(FilePath)
-   res.json({status:true , message:"Upload Online Successfully",data })
-}
-catch(err){
-   res.json({status:false ,error:err.keyValue , message:err.message})
-}
+const UploadOnline = async (req, res) => {
+   try {
+      const FilePath = req.file.path
+      UploadCloudinary(FilePath)
+
+      res.json({ status: true, message: "Upload Online Successfully", })
+   }
+   catch (err) {
+      res.json({ status: false, error: err.keyValue, message: err.message })
+   }
 }
 
-export { UserRegistraion, UserLogin, getUserData, DeleteUser, Pagination, UserAddress, UserAddressDelete, ForgotPwd, VerifyPwd, UploadProfile ,UploadOnline };
+const SendUserMail = async (req, res) => {
+   try {
+      await SendMail()
+      res.json({ status: true, message: "Email Send Successfully" })
+   }
+   catch (err) {
+      res.json({ status: false, err: err.keyValue, message: err.message })
+   }
+}
+
+const  VerifyMail = async (req, res) => {
+    const user =  UserModel.findOne({_id : req.params.id})
+    if(!user){
+      res.json({status:false , message:"Invalid link"} )
+    }
+
+      
+}
+
+
+
+export {
+   UserRegistraion,
+   UserLogin,
+   getUserData,
+   DeleteUser,
+   Pagination,
+   UserAddress,
+   UserAddressDelete,
+   ForgotPwd,
+   VerifyPwd,
+   UploadProfile,
+   UploadOnline,
+   SendUserMail,
+   VerifyMail
+};
 
 
 

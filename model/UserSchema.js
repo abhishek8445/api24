@@ -22,7 +22,13 @@ const UserData = mongoose.Schema({
   },
   address:{                                             
     type: mongoose.Types.ObjectId, ref: 'useraddress'
-  },                                                                                  
+  }, 
+  isVerified:{
+    type:Boolean,
+    default:false
+  }
+
+                                                                                  
 })
 UserData.plugin(mongoosePaginate)
 const UserModel = new mongoose.model("clients", UserData);
