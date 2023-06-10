@@ -6,7 +6,7 @@ dotenv.config()
 
 
 const SendMail = async (Email, url)=>{
-    const MailTransporter =  nodemailer.createTransport({
+    const MailTransporter = nodemailer.createTransport({
      service:'gmail',
      auth:{
          user:process.env.USER_NAME ,
@@ -20,7 +20,7 @@ const SendMail = async (Email, url)=>{
      to:Email,
      subject:"Test Mail",
      text: "Test a mail send a user by a nodemail ",
-     html:`<button> ${url} </button>`
+     html:`<button> <a href= "${url}">Verify Me</a> </button>`
     }
 
   await  MailTransporter.sendMail(MailDetails), function (err , data ){
@@ -28,7 +28,7 @@ const SendMail = async (Email, url)=>{
        throw  Error ('Email Failed')
      }
      else{
-         console.log('data');
+         throw data
      }
     }
  }

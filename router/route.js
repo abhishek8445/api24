@@ -1,5 +1,6 @@
 import express from 'express';
-import { DeleteUser, Pagination, getUserData, UserAddress, UserLogin, UserRegistraion, UserAddressDelete, ForgotPwd, VerifyPwd, UploadProfile, UploadOnline ,SendUserMail ,VerifyMail} from '../controller/UserController.js';
+import { DeleteUser, Pagination, getUserData, UserAddress, UserLogin, UserRegistraion, UserAddressDelete, ForgotPwd, VerifyPwd, UploadProfile, UploadOnline ,SendUserMail  } from '../controller/UserController.js';
+import VerifyMail from '../controller/MailLink/UserVerify.js';
 import passportConfig from '../Authentication/UserAuth.js';
 import { LoginMiddlewere, PwdMiddleware } from '../middleware/UserMiddleware.js'
 import passport from 'passport';
@@ -23,7 +24,7 @@ router.put('/verify-reset-password/:pwdtoken', PwdMiddleware, VerifyPwd);
 router.put('/profile-image', upload.single('profile_img'), UploadProfile);
 router.post("/upload", upload.single("file"), UploadOnline)
 router.post ("/usenodemailer" , SendUserMail)
-router.get("/:id/verify/:token" , VerifyMail)
+router.get("/verify/:id" , VerifyMail)
 
 
 export default router;  

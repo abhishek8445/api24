@@ -1,4 +1,4 @@
-import mongoose, { Schema } from "mongoose";
+import mongoose from "mongoose";
 import mongoosePaginate from 'mongoose-paginate'
 
 const UserData = mongoose.Schema({
@@ -20,13 +20,15 @@ const UserData = mongoose.Schema({
   lastname: {
     type: String,
   },
-  address:{                                             
-    type: mongoose.Types.ObjectId, ref: 'useraddress'
-  }, 
+
   isVerified:{
     type:Boolean,
     default:false
-  }
+  },
+
+  address:{                                             
+    type: mongoose.Types.ObjectId, ref: 'useraddress'
+  }, 
 
                                                                                   
 })

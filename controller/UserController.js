@@ -1,9 +1,6 @@
 
-import { UserModel } from "../model/UserSchema.js";
 import { DelteUserDetails, UserDetails, UserGetPagination, LoginService, createUser, getUser, AddressDelete, UserForgotPwd, ResetPwd, UploadCloudinary } from "../services/crudService.js";
-import SendMail from "../services/MailService.js";
-
-
+// import SendMail from "../services/MailService.js";
 const UserRegistraion = async (req, res) => {
    try {
       await createUser(req.body);
@@ -138,17 +135,6 @@ const SendUserMail = async (req, res) => {
    }
 }
 
-const  VerifyMail = async (req, res) => {
-    const user =  UserModel.findOne({_id : req.params.id})
-    if(!user){
-      res.json({status:false , message:"Invalid link"} )
-    }
-
-      
-}
-
-
-
 export {
    UserRegistraion,
    UserLogin,
@@ -162,7 +148,6 @@ export {
    UploadProfile,
    UploadOnline,
    SendUserMail,
-   VerifyMail
 };
 
 

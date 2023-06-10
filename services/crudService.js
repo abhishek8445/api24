@@ -1,4 +1,5 @@
 import { UserModel, TokenModel, AddressModel, Pwdmodel } from "../model/UserSchema.js"
+
 import SendMail from "./MailService.js"
 import bcrypt from 'bcrypt'
 import jwt from "jsonwebtoken"
@@ -33,13 +34,15 @@ const createUser = async (data) => {
     }
     const body = new UserModel(AlloverData);
     await body.save();
-    
 
-    const GenrateToken = jwt.sign({ AlloverData }, process.env.SECRET_KEY, { expiresIn: '120s' }); 
-    const url = `${process.env.BASE_URL}/:${body._id}/verify/${GenrateToken}`
-    const Email = body.email            
-    SendMail(Email ,url)              
-} 
+    // const token = jwt.sign({ body }, process.env.SECRET_KEY, { expiresIn: '120s' });
+     const id = body._id
+    const url = `${process.env.BASE_URL}/verify/${id}`
+    const Email = body.email
+    SendMail(Email, url)
+ 
+ 
+}
 
 const LoginService = async (requestData) => {
     try {
